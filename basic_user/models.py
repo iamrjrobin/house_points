@@ -33,19 +33,19 @@ class Point(models.Model):
     def save(self, *args, **kwargs):
         # is_new = True if not self.id else False
         super(Point, self).save(*args, **kwargs)
-        log = Logger(emp=self.employee, remarks= f"Point changed: {self.value}")
+        log = Logger(emp=self.employee, remarks=f"Point changed: {self.value} {self.remarks}")
         log.save()
 
 
 class House(models.Model):
     name = models.CharField(max_length=50)
     points = models.IntegerField(default=0)
+    
     pic = models.ImageField(default='default.jpg', upload_to ='profile_pics')
 
     def __str__(self):
         return self.name
     
-
     
     # @property
     # def point(self) : 
@@ -57,14 +57,11 @@ class House(models.Model):
     #     self.save()
         
     #     return points
- 
 class Logger(models.Model):
-    # class ActionChoice(models.IntegerChoices):
-    #     PointAction = 1   
     emp = models.ForeignKey('Employee', on_delete= models.CASCADE)
     remarks =  models.CharField(max_length=100, default="no remarks now")
-    # action = models.IntegerField(choices=ActionChoice.choices)
     date_and_time = models.DateTimeField(auto_now=True)
+    # house_rank =  models.IntegerField(default=0)
     # house_updated_points = models.IntegerField(default=0)
 
 
@@ -87,3 +84,4 @@ class Logger(models.Model):
     #         self.emp = e.id
     #         self.remarks = e.remarks
     #     super(self).save(*args, **kwargs)  
+    

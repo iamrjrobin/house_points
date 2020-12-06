@@ -7,11 +7,13 @@
 </head>
 <body>
     {% for e in emp %}
-        
         <h3> {{e.name}}   </h3>
-        <h3> {{e.points}}   </h3>
-        <h3> {{e.designation}}   </h3>
-        <a href="{% url 'show' %}">Go back</a>
+        <p> {{e.points}}   </p>
+        <p> {{e.designation}}   </p>
+        <a href="{% url 'single_log' e.id %}">Detailed logs</a> <br>
     {% endfor %}
+    <br>
+    <a href="{% url 'logger' %}">Logs</a> <br>
+    <a href="{% url 'show' %}">Go back</a>
 </body>
 </html>

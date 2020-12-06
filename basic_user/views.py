@@ -14,10 +14,10 @@ def display(request):
     print(house)
     return render (request, 'basic_user/show.html',context)
 
-def details(request, house_name):
-    house= get_object_or_404(House, name=house_name)
+def details(request, house_id):
+    house= get_object_or_404(House, id=house_id)
     employees = Employee.objects.filter(house=house).annotate(points=Sum("point__value")).order_by('-points')
-    print(employees.query)
+    # print(employees.query)
     # employees= house.employee_set.all().order_by('-points')
     context= {
         'emp' : employees
@@ -28,7 +28,16 @@ def taking_logs(request):
     # emps= get_object_or_404(Employee)
     # logs= get_object_or_404(Logger)
     # super().taking_logs(Employee, Logger)
+    log = Logger.objects.all().order_by('-date_and_time')
     context={
-        'log' : Logger.objects.all()
+        'log' : log 
     }
     return render(request, 'basic_user/logs.html', context)
+
+def single_log(request, employee_id):
+    emps= get_object_or_404(Employee, id=employee_id)
+    logs = Logger.objects.filter(emp=emps.id).order_by('-date_and_time')
+    context = {
+        'logs' : logs
+    }   
+    return render(request, 'basic_user/single_log.html', context)
