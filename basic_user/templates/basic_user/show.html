@@ -28,9 +28,9 @@
 </head>
 <body>
     <div class="flex-container">
-        {% for houses in house %}
+        {% for houses in house %} 
             <div>
-                <h3>{{houses.name}}</h3> 
+                <h3>({{ forloop.counter }}) {{houses.name}}</h3> 
             </div>
             <div>
                 <img  height="200"  width="300"  src="{{houses.pic.url}}"><br>

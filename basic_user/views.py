@@ -29,15 +29,19 @@ def taking_logs(request):
     # logs= get_object_or_404(Logger)
     # super().taking_logs(Employee, Logger)
     log = Logger.objects.all().order_by('-date_and_time')
+    house = House.objects.annotate(point=Sum("employee__point__value")).order_by('-point')
     context={
-        'log' : log 
+        'log' : log, 
+        'house' : house
     }
     return render(request, 'basic_user/logs.html', context)
 
 def single_log(request, employee_id):
     emps= get_object_or_404(Employee, id=employee_id)
     logs = Logger.objects.filter(emp=emps.id).order_by('-date_and_time')
+    house = House.objects.annotate(point=Sum("employee__point__value")).order_by('-point')
     context = {
-        'logs' : logs
+        'logs' : logs,
+        'house' : house
     }   
     return render(request, 'basic_user/single_log.html', context)

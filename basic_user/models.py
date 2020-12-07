@@ -3,6 +3,8 @@ from PIL import Image
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
 from django.db.models.signals import post_save
 from django.dispatch import receiver  
+from django.shortcuts import get_object_or_404
+from django.db.models import Sum
 
 # Create your models here.
 class Employee(models.Model):
@@ -32,20 +34,36 @@ class Point(models.Model):
 
     def save(self, *args, **kwargs):
         # is_new = True if not self.id else False
+        h=self.employee.house
+        before = h.get_rank()
+        # print(before)
         super(Point, self).save(*args, **kwargs)
-        log = Logger(emp=self.employee, remarks=f"Point changed: {self.value} {self.remarks}")
+        after = h.get_rank()
+        # print(after)
+        log = Logger(emp=self.employee, remarks=f"Point changed: {self.value} {self.remarks} Before point update rank was {before}, after points update rank is {after}")
         log.save()
 
 
 class House(models.Model):
     name = models.CharField(max_length=50)
     points = models.IntegerField(default=0)
-    
+    rank = models.IntegerField(default=0)
     pic = models.ImageField(default='default.jpg', upload_to ='profile_pics')
 
     def __str__(self):
         return self.name
     
+    def get_rank(self) -> int:
+        houses = House.objects.annotate(point=Sum("employee__point__value")).order_by('-point').values_list("id", flat=True)
+
+        house_list = []
+        for x in houses:
+            house_list.append(x)
+    
+        rank = house_list.index(self.id)
+        
+        return rank + 1
+
     
     # @property
     # def point(self) : 
