@@ -1,13 +1,17 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import Employee, House, Logger
+from .models import Employee, House, Logger, Point
 from django.shortcuts import get_object_or_404
-from django.db.models import Sum
+from django.db.models import Sum, Max, Min, Q
 
 
 # Create your views here.
 def display(request):
     house = House.objects.annotate(point=Sum("employee__point__value")).order_by('-point')
+    # h = House.objects.all()
+    query = request.GET.get("q")
+    if query:
+        house =house.filter(name__icontains=query)
     context = {
         'house' : house
     }
@@ -17,8 +21,23 @@ def display(request):
 def details(request, house_id):
     house= get_object_or_404(House, id=house_id)
     employees = Employee.objects.filter(house=house).annotate(points=Sum("point__value")).order_by('-points')
-    # print(employees.query)
-    # employees= house.employee_set.all().order_by('-points')
+    query = request.GET.get("q")
+    query_min = request.GET.get("q_min")
+    query_max = request.GET.get("q_max")
+    if query:
+        employees =employees.filter(name__icontains=query)
+    # if query_min and query_max:
+    #     # employees = Point.objects.filter(value__range=(query_min, query_max))
+    #     employees = employees.filter(point__value__range=(query_min, query_max))
+    # if query_max:
+    #     employees = employees.annotate(points = Sum("point__value")).filter(points__gte=query_max)
+    # if query_min:
+    #     employees = employees.annotate(points = Sum("point__value")).filter(points__lte=query_min)
+
+    if query_max:
+        employees = employees.filter(points__lte= query_max)
+    if query_min:
+        employees = employees.filter(points__gte=query_min)
     context= {
         'emp' : employees
     }

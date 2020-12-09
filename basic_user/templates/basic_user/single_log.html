@@ -1,16 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> </title>
-</head>
-<body>
+{% extends "basic_user/base.html" %}
+{% block content %}
     {% for l in logs %}
         <h3> {{l.emp}}   </h3>
         <p> {{l.remarks}}   </p>
         <p> {{l.date_and_time}}   </p>
     {% endfor %}
     <a href="{% url 'show'  %}">Home Page</a>  
-</body>
-</html>
+{% endblock content %}

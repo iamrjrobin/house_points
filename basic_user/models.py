@@ -40,7 +40,7 @@ class Point(models.Model):
         super(Point, self).save(*args, **kwargs)
         after = h.get_rank()
         # print(after)
-        log = Logger(emp=self.employee, remarks=f"Point changed: {self.value} {self.remarks} Before point update rank was {before}, after points update rank is {after}")
+        log = Logger(emp=self.employee, remarks=f"Point changed: {self.value} {self.remarks} Before point update house rank was {before}, after points update house rank is {after}")
         log.save()
 
 
@@ -83,8 +83,8 @@ class Logger(models.Model):
     # house_updated_points = models.IntegerField(default=0)
 
 
-    # def __str__(self):
-    #     return self.emp
+    def __str__(self):
+        return self.remarks
 
     # @property
     # def taking_log(self, Employee):
@@ -102,4 +102,3 @@ class Logger(models.Model):
     #         self.emp = e.id
     #         self.remarks = e.remarks
     #     super(self).save(*args, **kwargs)  
-    

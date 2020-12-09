@@ -1,19 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> </title>
-</head>
-<body>
+{% extends "basic_user/base.html" %}
+{% block content %}
+<form method = 'GET' action="" method="get">
+    <input name="q" type = "text" placeholder="Search via name" value="{{ request.GET.q }}"/><br><br>
+    <!-- <input name="q_house" type = "text" placeholder="Search via house name" value="{{ request.GET.q_house }}"/><br><br> -->
+    <input name="q_min" type = "number" placeholder="Enter min point" value="{{ request.GET.q_min }}"/>
+    <input name="q_max" type = "number" placeholder="Enter max point" value="{{ request.GET.q_max }}"/><br><br>
+    <input type = "submit" value = "Search" />
+</form> <br>
     {% for e in emp %}
         <h3> {{e.name}}   </h3>
-        <p> {{e.points}}   </p>
+        <p> Total Points: {{e.points}}   </p>
         <p> {{e.designation}}   </p>
-        <a href="{% url 'single_log' e.id %}">Detailed logs</a> <br>
+        <a href="{% url 'single_log' e.id %}">Detailed logs</a> <br><br>
     {% endfor %}
     <br>
     <a href="{% url 'logger' %}">Logs</a> <br>
     <a href="{% url 'show' %}">Go back</a>
-</body>
-</html>
+{% endblock content %}
