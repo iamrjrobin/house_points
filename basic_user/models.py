@@ -10,7 +10,7 @@ from django.db.models import Sum
 class Employee(models.Model):
     name = models.CharField(max_length=100)
     designation = models.CharField(max_length=30)
-    # points = models.IntegerField(default=0)
+    points = models.IntegerField(default=0)
     house = models.ForeignKey('House',on_delete=models.CASCADE)
     # remarks =  models.CharField(max_length=100, default="no remarks now")
 
@@ -21,18 +21,22 @@ class Employee(models.Model):
     
 
     # @property
-    # def own_ponits(self):
-    #     employees = Employee.objects.filter(house=self)
-    #     for e in employees:
-    #         det = [self.name, self.points,self.house, self.designation]
-    #     return det
+    def own_ponits(self):
+        employees = Point.objects.filter(employee=self)
+        points = 0
+        for e in employees:
+            points += e.value
+        self.points=points
+        self.save()
+        # return points
+
         
 class Point(models.Model):
     employee = models.ForeignKey(Employee,on_delete= models.CASCADE)
     value = models.IntegerField(default=0)
     remarks = models.TextField(max_length=1000, null=True, blank=True)
 
-    def save(self, *args, **kwargs):
+    def save(self,House, Employee, *args, **kwargs):
         # is_new = True if not self.id else False
         h=self.employee.house
         before = h.get_rank()
@@ -40,21 +44,27 @@ class Point(models.Model):
         super(Point, self).save(*args, **kwargs)
         after = h.get_rank()
         # print(after)
+        employees = Employee.objects.filter(house=house)
+        for employee in employees:
+            employee.own_ponits()
+        house = House.objects.all().order_by('-point')
+        for house in house:
+            house.points()
         log = Logger(emp=self.employee, remarks=f"Point changed: {self.value} {self.remarks} Before point update house rank was {before}, after points update house rank is {after}")
         log.save()
 
 
 class House(models.Model):
     name = models.CharField(max_length=50)
-    points = models.IntegerField(default=0)
-    rank = models.IntegerField(default=0)
+    point = models.IntegerField(default=0)
+    # rank = models.IntegerField(default=0)
     pic = models.ImageField(default='default.jpg', upload_to ='profile_pics')
 
     def __str__(self):
         return self.name
     
     def get_rank(self) -> int:
-        houses = House.objects.annotate(point=Sum("employee__point__value")).order_by('-point').values_list("id", flat=True)
+        houses = House.objects.annotate(pnt=Sum("employee__point__value")).order_by('-point').values_list("id", flat=True)
 
         house_list = []
         for x in houses:
@@ -63,6 +73,18 @@ class House(models.Model):
         rank = house_list.index(self.id)
         
         return rank + 1
+
+
+
+    def points(self) : 
+        employees = Employee.objects.filter(house=self)
+        points = 0
+        for employee in employees:
+            points += employee.points
+        self.point=points
+        self.save()
+        
+        # return points
 
     
     # @property
