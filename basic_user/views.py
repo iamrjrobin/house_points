@@ -10,11 +10,11 @@ from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 def display(request):
-    # house = House.objects.annotate(pnt=Sum("employee__point__value")).order_by('-pnt')
-    house = House.objects.all().order_by('-point')
+    house = House.objects.annotate(pnt=Sum("employee__point__value")).order_by('-pnt')
+    # house = House.objects.all().order_by('-point')
     for h in house:
         h.points()
-    h = House.objects.all()
+    # h = House.objects.all()
     query = request.GET.get("q")
     if query:
         house =house.filter(name__icontains=query)
@@ -26,12 +26,12 @@ def display(request):
 
 def details(request, house_id):
     house= get_object_or_404(House, id=house_id)
-    # employees = Employee.objects.filter(house=house).annotate(p=Sum("point__value")).order_by('-p')
     employees = Employee.objects.filter(house=house)
     for employee in employees:
         employee.own_ponits()
-    house = House.objects.all().order_by('-point')
-    employees = employees.order_by('-points')
+    employees = Employee.objects.filter(house=house).annotate(p=Sum("point__value")).order_by('-p')
+    # house = House.objects.all().order_by('-point')
+    # employees = employees.order_by('-points')
     query = request.GET.get("q")
     query_min = request.GET.get("q_min")
     query_max = request.GET.get("q_max")

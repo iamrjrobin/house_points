@@ -9,7 +9,7 @@
 </form> <br>
     {% for e in emp %}
         <h3> {{e.name}}   </h3>
-        <p> Total Points: {{e.points}}   </p>
+        <p> Total Points: {{e.p}}   </p>
         <p> {{e.designation}}   </p>
         <a href="{% url 'single_log' e.id %}">Detailed logs</a> <br><br>
     {% endfor %}
