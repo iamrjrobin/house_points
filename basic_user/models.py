@@ -36,7 +36,7 @@ class Point(models.Model):
     value = models.IntegerField(default=0)
     remarks = models.TextField(max_length=1000, null=True, blank=True)
 
-    def save(self,House, Employee, *args, **kwargs):
+    def save(self, *args, **kwargs):
         # is_new = True if not self.id else False
         h=self.employee.house
         before = h.get_rank()
@@ -44,14 +44,15 @@ class Point(models.Model):
         super(Point, self).save(*args, **kwargs)
         after = h.get_rank()
         # print(after)
-        employees = Employee.objects.filter(house=house)
-        for employee in employees:
-            employee.own_ponits()
-        house = House.objects.all().order_by('-point')
-        for house in house:
-            house.points()
+        # employees = Employee.objects.filter(house=house)
+        # for employee in employees:
+        #     employee.own_ponits()
+        # house = House.objects.all().order_by('-point')
+        # for house in house:
+        #     house.points()
         log = Logger(emp=self.employee, remarks=f"Point changed: {self.value} {self.remarks} Before point update house rank was {before}, after points update house rank is {after}")
         log.save()
+        
 
 
 class House(models.Model):
