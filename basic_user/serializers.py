@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import House, Employee, Logger, Point
+from rest_framework import filters,generics
 
 # class House_Serializer(serializers.Serializer):
 #     name = serializers.CharField(max_length=50)
@@ -27,6 +28,7 @@ class Emp_Serializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['name', 'designation', 'points','house']
+
 
 class Logger_Serializer(serializers.ModelSerializer):
     # emp = Emp_Serializer()

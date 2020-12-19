@@ -7,6 +7,12 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
 from .serializers import House_Serializer, Emp_Serializer, Logger_Serializer, Point_Serializer
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework import filters,generics
+
 
 # Create your views here.
 def display(request):
@@ -78,7 +84,11 @@ def single_log(request, employee_id):
 
 
 #api section
-@csrf_exempt
+# 
+# 
+# 
+
+@api_view(['GET', 'POST'])
 def api_display(request):
     if request.method == 'GET':
         # house = House.objects.annotate(point=Sum("employee__point__value")).order_by('-point')
@@ -87,25 +97,33 @@ def api_display(request):
         #     h.point()
         house = House.objects.all().order_by('-point')
         ser = House_Serializer(house, many= True)
-        return JsonResponse(ser.data, safe = False)
+        return Response(ser.data)
 
     elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        ser = House_Serializer(data=data)
+        # data = JSONParser().parse(request)
+        ser = House_Serializer(data=request.data)
         
         if ser.is_valid():
             ser.save()
-            return JsonResponse(ser.data, status = 201)
-        return JsonResponse(ser.errors, status = 400)
+            return JsonResponse(ser.data, status = status.HTTP_201_CREATED)
+        return Response(ser.errors, status = status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
 def api_details(request, house_id):
     if request.method == 'GET':
         house= get_object_or_404(House, id=house_id)
         # employees = Employee.objects.filter(house=house).annotate(points=Sum("point__value")).order_by('-points')
         employees = Employee.objects.filter(house=house).order_by('-points')
         ser = Emp_Serializer(employees, many = True)
-        return JsonResponse(ser.data, safe=False)
-    
+        # filter_backends = [filters.SearchFilter]
+        # search_fields = ['name']
+        return Response(ser.data)
+class Emp_list_view(generics.ListAPIView):
+    queryset = Employee.objects.all()
+    serializer_class = Emp_Serializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name', ' house']
+
     # elif request.method == 'POST':
     #     data = JSONParser().parse(request)
     #     ser = Emp_Serializer(data=data)
