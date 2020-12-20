@@ -123,7 +123,9 @@ class Emp_list_view(generics.ListAPIView):
     queryset = Employee.objects.all()
     serializer_class = Emp_Serializer
     filter_backends = (DjangoFilterBackend, SearchFilter)
-    filter_fields = ['name']
+    filter_fields = {
+        'points': ['lte','gte']
+    }
     search_fields = ['name']
 
     # elif request.method == 'POST':
