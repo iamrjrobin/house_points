@@ -9,6 +9,7 @@ urlpatterns = [
     path('<int:house_id>/', views.details, name='details'),
     path('api/display/', views.api_display),
     path('api/display/<int:house_id>', views.api_details),
+    path('api/display/find/<int:house_id>', views.Emp_list_view.as_view()),
     path('api/logs', views.api_taking_logs),
     path('api/logs/single_logs/<int:employee_id>',views.api_single_log),
     path('api/show_all_emp/',  views.api_all_emp),

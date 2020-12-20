@@ -12,7 +12,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import filters,generics
-
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
 
 # Create your views here.
 def display(request):
@@ -121,8 +122,9 @@ def api_details(request, house_id):
 class Emp_list_view(generics.ListAPIView):
     queryset = Employee.objects.all()
     serializer_class = Emp_Serializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['name', ' house']
+    filter_backends = (DjangoFilterBackend, SearchFilter)
+    filter_fields = ['name']
+    search_fields = ['name']
 
     # elif request.method == 'POST':
     #     data = JSONParser().parse(request)
