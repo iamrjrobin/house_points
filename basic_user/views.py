@@ -7,13 +7,14 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
 from .serializers import House_Serializer, Emp_Serializer, Logger_Serializer, Point_Serializer
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import filters,generics
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
+from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
 def display(request):
@@ -90,6 +91,7 @@ def single_log(request, employee_id):
 # 
 
 @api_view(['GET', 'POST'])
+@permission_classes((IsAuthenticated,))
 def api_display(request):
     if request.method == 'GET':
         # house = House.objects.annotate(point=Sum("employee__point__value")).order_by('-point')
