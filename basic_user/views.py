@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 from rest_framework import filters,generics
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
 # Create your views here.
 def display(request):
@@ -91,7 +91,7 @@ def single_log(request, employee_id):
 # 
 
 @api_view(['GET', 'POST'])
-@permission_classes((IsAuthenticated,))
+@permission_classes((IsAuthenticatedOrReadOnly, ))
 def api_display(request):
     if request.method == 'GET':
         # house = House.objects.annotate(point=Sum("employee__point__value")).order_by('-point')
@@ -101,7 +101,7 @@ def api_display(request):
         house = House.objects.all().order_by('-point')
         ser = House_Serializer(house, many= True)
         return Response(ser.data)
-
+    
     elif request.method == 'POST':
         # data = JSONParser().parse(request)
         ser = House_Serializer(data=request.data)
@@ -112,6 +112,7 @@ def api_display(request):
         return Response(ser.errors, status = status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
+@permission_classes((IsAuthenticatedOrReadOnly, ))
 def api_details(request, house_id):
     if request.method == 'GET':
         house= get_object_or_404(House, id=house_id)
@@ -138,7 +139,8 @@ class Emp_list_view(generics.ListAPIView):
     #         ser.save()
     #         return JsonResponse(ser.data,status = 201)
     #     return JsonResponse(ser.errors, status = 400)
-@csrf_exempt
+@api_view(['GET', 'POST'])
+@permission_classes((IsAuthenticatedOrReadOnly, ))
 def api_all_emp(request):
     if request.method == 'GET':
         employees = Employee.objects.all()
@@ -154,7 +156,8 @@ def api_all_emp(request):
             return JsonResponse(ser.data, status =201)
         return JsonResponse(ser.errors, status = 400)
 
-@csrf_exempt
+@api_view(['GET', 'POST'])
+@permission_classes((IsAuthenticatedOrReadOnly, ))
 def api_points(request):
     if request.method == 'GET':
         points = Point.objects.all()
