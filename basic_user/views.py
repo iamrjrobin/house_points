@@ -155,6 +155,38 @@ def api_all_emp(request):
             ser.save()
             return JsonResponse(ser.data, status =201)
         return JsonResponse(ser.errors, status = 400)
+    
+    # elif request.method == 'PUT':
+    #     ser = Emp_Serializer(employees,data = request.data)
+    #     data = {}
+    #     if ser.is_valid():
+    #         ser.save()
+    #         date["success"]= "update successful"
+    #         return JsonResponse(ser.data, status =201)
+    #     return JsonResponse(ser.errors,status=400)
+
+
+@api_view(['PUT','PATCH'])
+@permission_classes((IsAuthenticatedOrReadOnly, ))
+def api_all_emp_update(request,employee_id):
+    try:
+        employees = Employee.objects.get(id = employee_id)
+    except Employee.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'PUT':
+        # employees = Employee.objects.all()
+        ser = Emp_Serializer(employees,data = request.data)
+        data = {}
+        if ser.is_valid():
+            ser.save()
+            data["success"]= "update successful"
+            return JsonResponse(ser.data, status =201)
+        return JsonResponse(ser.errors,status=400)
+    # elif request.method == 'PATCH':
+
+
+
 
 @api_view(['GET', 'POST'])
 @permission_classes((IsAuthenticatedOrReadOnly, ))
@@ -172,6 +204,7 @@ def api_points(request):
             ser.save()
             return JsonResponse(ser.data, status = 201)
         return JsonResponse(ser.errors, status = 400)
+    
 
 def api_taking_logs(request):
     if request.method == 'GET':
