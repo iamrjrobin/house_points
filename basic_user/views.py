@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Sum, Max, Min, Q
 from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
-from .serializers import House_Serializer, Emp_Serializer, Logger_Serializer, Point_Serializer
+from .serializers import House_Serializer, Emp_Serializer, Logger_Serializer, Point_Serializer,Emp_SerializerForPatch
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -183,8 +183,22 @@ def api_all_emp_update(request,employee_id):
             data["success"]= "update successful"
             return JsonResponse(ser.data, status =201)
         return JsonResponse(ser.errors,status=400)
-    # elif request.method == 'PATCH':
 
+@api_view(['PATCH'])
+@permission_classes((IsAuthenticatedOrReadOnly, ))
+def api_all_emp_partial_update(request, house_id,employee_id):
+    try:
+        employees = Employee.objects.get(id = employee_id,house = house_id)
+    except Employee.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.method == 'PATCH':
+        ser = Emp_SerializerForPatch(employees,data=request.data, partial=True)
+        data = {}
+        if ser.is_valid():
+            ser.save()
+            data["success"]= "patch successful"
+            return JsonResponse(ser.data, status =201)
+        return JsonResponse(ser.errors,status=400)
 
 
 

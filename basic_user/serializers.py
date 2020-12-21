@@ -27,7 +27,13 @@ class Emp_Serializer(serializers.ModelSerializer):
     # house = House_Serializer()
     class Meta:
         model = Employee
-        fields = ['name', 'designation', 'points','house']
+        fields = ['id','name', 'designation', 'points','house']
+
+class Emp_SerializerForPatch(serializers.ModelSerializer):
+    # house = House_Serializer()
+    class Meta:
+        model = Employee
+        fields = ['name', 'designation','house']
 
 
 class Logger_Serializer(serializers.ModelSerializer):
