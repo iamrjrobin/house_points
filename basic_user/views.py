@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import Employee, House, Logger, Point
 from django.shortcuts import get_object_or_404
@@ -15,8 +15,23 @@ from rest_framework import filters,generics
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 # Create your views here.
+
+# class HomeView(LoginRequiredMixin, TemplateView):
+#     template_name = "home.html" 
+
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(data = request.POST)
+        if form.is_valid():
+            return redirect ('/admin/')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'basic_user/login.html', {'form':form})
+
+
 def display(request):
     house = House.objects.annotate(pnt=Sum("employee__point__value")).order_by('-pnt')
     # house = House.objects.all().order_by('-point')
@@ -67,7 +82,8 @@ def taking_logs(request):
     # logs= get_object_or_404(Logger)
     # super().taking_logs(Employee, Logger)
     log = Logger.objects.all().order_by('-date_and_time')
-    house = House.objects.annotate(point=Sum("employee__point__value")).order_by('-point')
+    # house = House.objects.annotate(point=Sum("employee__point__value")).order_by('-point')
+    house =  House.objects.all().order_by('-point')
     context={
         'log' : log, 
         'house' : house
@@ -218,14 +234,17 @@ def api_points(request):
             ser.save()
             return JsonResponse(ser.data, status = 201)
         return JsonResponse(ser.errors, status = 400)
-    
 
+@api_view(['GET'])    
+@permission_classes((IsAuthenticated, ))
 def api_taking_logs(request):
     if request.method == 'GET':
         log = Logger.objects.all().order_by('-date_and_time')
         ser = Logger_Serializer(log, many = True)
         return JsonResponse(ser.data,safe = False)
 
+@api_view(['GET'])
+@permission_classes((IsAuthenticated, ))
 def api_single_log(request, employee_id):
     if request.method == 'GET':
         emps = get_object_or_404(Employee, id=employee_id)
