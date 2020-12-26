@@ -5,4 +5,4 @@ class BasicUserConfig(AppConfig):
     name = 'basic_user'
 
     def ready (self):
-        import Employee.signals
+        import basic_user.signals
