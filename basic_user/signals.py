@@ -2,6 +2,7 @@ from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from .models import Employee
+from django.conf import settings
 
 @receiver(post_save, sender=User)
 def create_employee(sender, instance, created, **kwargs):
@@ -11,3 +12,8 @@ def create_employee(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_employee(sender, instance, **kwargs):
     instance.employee.save()
+
+# @receiver(post_save, sender = settings.AUTH_USER_MODEL)
+# def create_auth_token(sender, instance = None, created = False, **kwargs):
+#     if created:
+#         Token.objects.create(user=instance)  

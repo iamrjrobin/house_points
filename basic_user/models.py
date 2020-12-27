@@ -6,6 +6,10 @@ from django.dispatch import receiver
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum
 from django.contrib.auth.models import User
+from django.conf import settings
+from rest_framework.authtoken.models import Token
+
+
 
 # Create your models here.
 class Employee(models.Model):
@@ -127,3 +131,7 @@ class Logger(models.Model):
     #         self.emp = e.id
     #         self.remarks = e.remarks
     #     super(self).save(*args, **kwargs)  
+@receiver(post_save, sender = settings.AUTH_USER_MODEL)
+def create_auth_token(sender, instance = None, created = False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)    
