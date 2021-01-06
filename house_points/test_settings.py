@@ -1,10 +1,10 @@
-from .settings import * 
+from .settings import *
 
-DATABASE = {
-    "default" : {
+DATABASES = {
+    "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": ":memory:",
     }
 }
 
-EMAIL_BAKCEND = 'django.core.mail.backends.locmem.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'

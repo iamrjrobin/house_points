@@ -23,7 +23,7 @@ schema_view = get_schema_view(
 
 
 urlpatterns = [
-    path('api/api-token-auth/', view.obtain_auth_token),
+    path('api/api-token-auth/', view.obtain_auth_token, name = 'token'),
     path('', views.display, name='show'),
     path('login/', views.login_view, name='login'),
     path('logs/single_log/<int:employee_id>/',views.single_log, name = 'single_log'),
@@ -31,13 +31,13 @@ urlpatterns = [
     path('<int:house_id>/', views.details, name='details'),
     path('api/display/', views.api_display, name = 'api_show'),
     path('api/display/<int:house_id>', views.api_details, name = 'api_details'),
-    path('api/display/find/<int:house_id>', views.Emp_list_view.as_view()),
+    path('api/display/find/<int:house_id>', views.Emp_list_view.as_view(), name = 'emp_list_view'),
     path('api/logs', views.api_taking_logs, name = 'api_logger'),
     path('api/logs/single_logs/<int:employee_id>',views.api_single_log, name = 'api_single_log'),
-    path('api/show_all_emp/',  views.api_all_emp),
-    path('api/api_all_emp_update/<int:employee_id>',views.api_all_emp_update), 
-    path('api/api_all_emp_partial_update/<int:house_id>/<int:employee_id>',views.api_all_emp_partial_update),
-    path('api/api_points/', views.api_points),
+    path('api/show_all_emp/',  views.api_all_emp, name = 'show_all_emp'),
+    path('api/api_all_emp_update/<int:employee_id>',views.api_all_emp_update, name = 'api_all_emp_update'), 
+    path('api/api_all_emp_partial_update/<int:house_id>/<int:employee_id>',views.api_all_emp_partial_update, name = 'api_all_emp_partial_update'),
+    path('api/api_points/', views.api_points, name = 'api_points'),
     # url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('oauth/', include('social_django.urls', namespace='social')),
