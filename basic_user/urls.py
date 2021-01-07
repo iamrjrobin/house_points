@@ -25,6 +25,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('api/api-token-auth/', view.obtain_auth_token, name = 'token'),
     path('', views.display, name='show'),
+    path('signup/', views.signup_view, name = 'signup'),
     path('login/', views.login_view, name='login'),
     path('logs/single_log/<int:employee_id>/',views.single_log, name = 'single_log'),
     path('logs/',views.taking_logs, name = 'logger'),

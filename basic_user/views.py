@@ -16,20 +16,39 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib import messages
+from basic_user.forms import SignUpForm
+from django.contrib.auth import login, authenticate
 
 # Create your views here.
 
 # class HomeView(LoginRequiredMixin, TemplateView):
 #     template_name = "home.html" 
+def signup_view(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            messages.success(request, f'Account created for {username}!')
+            return redirect('show')
+    else:
+        form = SignUpForm()
+    return render (request, 'basic_user/signup.html', {'form': form})
+
+
 
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(data = request.POST)
         if form.is_valid():
-            return redirect ('/admin/')
+            return redirect ('show')
     else:
         form = AuthenticationForm()
     return render(request, 'basic_user/login.html', {'form':form})
+
 
 
 def display(request):

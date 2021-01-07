@@ -18,6 +18,8 @@ class Employee(models.Model):
     designation = models.CharField(max_length=30)
     points = models.IntegerField(default=0)
     house = models.ForeignKey('House',on_delete=models.CASCADE,default=1)
+    # email = models.EmailField()
+    # password = forms.CharField(widget=forms.PasswordInput)
     # remarks =  models.CharField(max_length=100, default="no remarks now")
 
     def __str__(self):

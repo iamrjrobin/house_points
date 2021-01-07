@@ -99,16 +99,16 @@ class TestApi(APITestCase):
         assert resp.status_code == 200, 'Should be callable by anyone'
     
     # def test_api_display_post(client):  
-        # client.login(username="foo", password="bar")
-        # response = client.get(url, follow=True)
-        # assert response.status_code == 200
-        # response = admin_client.get(url, follow=True)
-        # assert response.status_code == 200
-        # obj = mixer.blend('basic_user.House')
-        # data = {'name': 'tsetssdfa'}        
-        # req = RequestFactory().post('/', data=data)
-        # req.user = AnonymousUser()
-        # resp = views.api_display(req)
-        # assert resp.status_code == 302, 'Should be callable by anyone'
-        # obj.refresh_from_db()
-        # assert obj.name == 'tsetssdfa', 'Should be the new name'
+    #     client.login(username="foo", password="bar")
+    #     response = client.get(url, follow=True)
+    #     assert response.status_code == 200
+    #     response = admin_client.get(url, follow=True)
+    #     assert response.status_code == 200
+    #     obj = mixer.blend('basic_user.House')
+    #     data = {'name': 'tsetssdfa'}        
+    #     req = RequestFactory().post('/', data=data)
+    #     req.user = AnonymousUser()
+    #     resp = views.api_display(req)
+    #     assert resp.status_code == 302, 'Should be callable by anyone'
+    #     obj.refresh_from_db()
+    #     assert obj.name == 'tsetssdfa', 'Should be the new name'
