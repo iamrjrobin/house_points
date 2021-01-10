@@ -1,6 +1,7 @@
-from rest_framework import serializers
-from .models import House, Employee, Logger, Point
-from rest_framework import filters,generics
+from django.contrib.auth.models import User
+from rest_framework import filters, generics, serializers
+
+from .models import Employee, House, Logger, Point
 
 # class House_Serializer(serializers.Serializer):
 #     name = serializers.CharField(max_length=50)
@@ -17,6 +18,30 @@ from rest_framework import filters,generics
 #         # instace.name = validated_data.get('name', instace.name) 
 #         instace.pic = validated_data.get('pic', instace.pic)
 #         return instace
+
+class SignUp_Serializer(serializers.ModelSerializer):
+    password2 = serializers.CharField(style={'input_time': 'password'}, write_only=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'email', 'password', 'password2',]
+        extra_kwarge = {
+            'password' :{'write_only':True}
+        }
+    def save(self):
+        employee = User(
+            first_name = self.validated_data['first_name'],
+            username = self.validated_data['username'],
+            email = self.validated_data['email'],
+        )
+        password = self.validated_data['password']
+        password2 = self.validated_data['password2']
+        
+        if password != password2:
+            raise serializers.ValidationError({'password': 'Passwords must match.'})
+        employee.set_password(password)
+        employee.save()
+        return employee
 
 class House_Serializer(serializers.ModelSerializer):
     class Meta:

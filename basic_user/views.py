@@ -1,24 +1,26 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from .models import Employee, House, Logger, Point
-from django.shortcuts import get_object_or_404
-from django.db.models import Sum, Max, Min, Q
-from django.http import HttpResponse, JsonResponse
-from rest_framework.parsers import JSONParser
-from .serializers import House_Serializer, Emp_Serializer, Logger_Serializer, Point_Serializer,Emp_SerializerForPatch
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework import filters,generics
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib import messages
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.db.models import Max, Min, Q, Sum
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.csrf import csrf_exempt
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, generics, status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.filters import SearchFilter
+from rest_framework.parsers import JSONParser
+from rest_framework.permissions import (AllowAny, IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from basic_user.forms import SignUpForm
-from django.contrib.auth import login, authenticate
+
+from .models import Employee, House, Logger, Point
+from .serializers import (Emp_Serializer, Emp_SerializerForPatch,
+                          House_Serializer, Logger_Serializer,
+                          Point_Serializer, SignUp_Serializer)
 
 # Create your views here.
 
@@ -124,6 +126,26 @@ def single_log(request, employee_id):
 # 
 # 
 # 
+
+@api_view(['POST',])
+@permission_classes((AllowAny,))
+def api_signup(request):
+    if request.method == 'POST':
+        ser = SignUp_Serializer(data=request.data)
+        if ser.is_valid():
+            ser.save()
+            return JsonResponse(ser.data, status = status.HTTP_201_CREATED)
+        return Response(ser.errors, status = status.HTTP_400_BAD_REQUEST)
+
+
+        # data = {}
+        # if ser.is_valid():
+        #     employee = ser.save()
+        #     data['response'] = "Successfully created user."
+        #     data['name'] = employee.name 
+        # else:
+        #     data = ser.errors
+        # return Response(data)
 
 @api_view(['GET', 'POST'])
 @permission_classes((IsAuthenticatedOrReadOnly, ))

@@ -1,14 +1,13 @@
-from django.db import models
-from PIL import Image
-from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
-from django.db.models.signals import post_save
-from django.dispatch import receiver  
-from django.shortcuts import get_object_or_404
-from django.db.models import Sum
-from django.contrib.auth.models import User
 from django.conf import settings
+from django.contrib.admin.models import ADDITION, CHANGE, LogEntry
+from django.contrib.auth.models import User
+from django.db import models
+from django.db.models import Sum
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.shortcuts import get_object_or_404
+from PIL import Image
 from rest_framework.authtoken.models import Token
-
 
 
 # Create your models here.

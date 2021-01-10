@@ -1,11 +1,13 @@
-from django.urls import path, include
-from .import views 
-from rest_framework import permissions
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
-from rest_framework.authtoken import views as view
-from django.contrib.auth import views as auth_views
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
+from django.urls import include, path
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
+from rest_framework.authtoken import views as view
+
+from . import views
+
 # from core import views as core_views
 
 schema_view = get_schema_view(
@@ -30,6 +32,7 @@ urlpatterns = [
     path('logs/single_log/<int:employee_id>/',views.single_log, name = 'single_log'),
     path('logs/',views.taking_logs, name = 'logger'),
     path('<int:house_id>/', views.details, name='details'),
+    path('api/signup', views.api_signup, name = 'api_signup'),
     path('api/display/', views.api_display, name = 'api_show'),
     path('api/display/<int:house_id>', views.api_details, name = 'api_details'),
     path('api/display/find/<int:house_id>', views.Emp_list_view.as_view(), name = 'emp_list_view'),
