@@ -1,18 +1,21 @@
+import json
+
 import pytest
-from django.test import TestCase, Client
-# from .serializers import House_Serializer, Emp_Serializer, Logger_Serializer, Point_Serializer,Emp_SerializerForPatch
-from django.contrib.auth.models import AnonymousUser
+from basic_user import views
+from basic_user.models import Employee, House, Logger, Point
+from basic_user.serializers import (Emp_Serializer, Emp_SerializerForPatch,
+                                    House_Serializer, Logger_Serializer,
+                                    Point_Serializer, SignUp_Serializer)
+from django.contrib.auth.models import AnonymousUser, User
+from django.shortcuts import redirect, render
+from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
-from django.contrib.auth.models import User
+from mixer.backend.django import mixer
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from rest_framework.test import APITestCase
-from basic_user.models import Employee, Point, House, Logger
-import json
-from django.shortcuts import render, redirect
-from basic_user import views
-from django.test import RequestFactory
-from mixer.backend.django import mixer
+from rest_framework.test import (APIClient, APIRequestFactory, APITestCase,
+                                 force_authenticate)
+
 pytestmark = pytest.mark.django_db
 
 
@@ -92,12 +95,35 @@ class TestViews(TestCase):
 class TestApi(APITestCase):
     
     def test_api_display(self):
-        req = RequestFactory().get('/')
+        req = APIRequestFactory().get('/')
+        Ob = mixer.blend('auth.User', is_superuser = True)
         obj = mixer.blend('basic_user.House')
         req.user = AnonymousUser()
         resp = views.api_display(req)
         assert resp.status_code == 200, 'Should be callable by anyone'
+        data = {"name": "testHouseName", "point": 0}
+        user = User.objects.filter().first()
+        req = APIRequestFactory().post('/',data, format = 'json')
+        force_authenticate(req, user=user.pk, token=user.auth_token)
+        resp = views.api_display(req)
+        assert resp.status_code == 201, 'Should create new house'
+
+
+
+    def test_api_signup(self):
+        obj = mixer.blend('basic_user.House')
+        data = {"username": "testusername", "first_name": "testname", "email": "test@loc.com", "password": "testing321", "password2": "testing321"}
+        req = APIRequestFactory().post("api/signup", data, format='json')
+        resp = views.api_signup(req)
+        assert resp.status_code == 201, 'Should create a new user'
+        # obj = mixer.blend('basic_user.House')
+        data = {"username": "testusername", "first_name": "testname", "email": "test@loc.com", "password": "testing3321", "password2": "testing321"}
+        req = APIRequestFactory().post("api/signup", data, format='json')
+        resp = views.api_signup(req)
+        assert resp.status_code == 400, 'Both password must match'
     
+    
+
     # def test_api_display_post(client):  
     #     client.login(username="foo", password="bar")
     #     response = client.get(url, follow=True)

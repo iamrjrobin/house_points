@@ -1,11 +1,21 @@
+from basic_user.views import (api_all_emp, api_all_emp_partial_update,
+                              api_all_emp_update, api_details, api_display,
+                              api_points, api_signup, api_single_log,
+                              api_taking_logs, details, display, login_view,
+                              signup_view, single_log, taking_logs)
 from django.test import SimpleTestCase
-from django.urls import reverse, resolve
-from basic_user.views import display, details, taking_logs, single_log, login_view, api_display, api_details, api_taking_logs, api_single_log, api_points, api_all_emp, api_all_emp_update, api_all_emp_partial_update
+from django.urls import resolve, reverse
+
 
 class TestUrls(SimpleTestCase):
     
+    def test_signup_view_is_resolved(self):
+        url = reverse('signup')
+        print(resolve(url))
+        self.assertEqual(resolve(url).func, signup_view)
+
     def test_show_url_is_resolved(self):
-        url = reverse('show')
+        url = reverse('show')   
         print(resolve(url))
         self.assertEqual(resolve(url).func, display)
 
@@ -68,3 +78,9 @@ class TestUrls(SimpleTestCase):
         url = reverse('api_all_emp_partial_update', args = [1,1])
         print(resolve(url))
         self.assertEqual(resolve(url).func, api_all_emp_partial_update)
+
+    def test_api_signup_url_is_resolve(self):
+        url = reverse('api_signup')
+        print(resolve(url))
+        self.assertEqual(resolve(url).func, api_signup)
+
