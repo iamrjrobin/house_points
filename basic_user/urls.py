@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from django.urls import include, path
+from django.urls import include, path , re_path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
@@ -27,12 +27,14 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('api/api-token-auth/', view.obtain_auth_token, name = 'token'),
-    path('', views.display, name='show'),
+    
+    re_path(r'^$',views.display, name = 'show'),
     path('signup/', views.signup_view, name = 'signup'),
     path('login/', views.login_view, name='login'),
     path('logs/single_log/<int:employee_id>/',views.single_log, name = 'single_log'),
     path('logs/',views.taking_logs, name = 'logger'),
-    path('<int:house_id>/', views.details, name='details'),
+    
+    re_path(r'^(?P<house_id>[0-9]+)/$', views.details, name ='details'),
     path('api/signup', views.api_signup, name = 'api_signup'),
     path('api/login', obtain_auth_token, name = 'api_login'),
     path('api/display/', views.api_display, name = 'api_show'),

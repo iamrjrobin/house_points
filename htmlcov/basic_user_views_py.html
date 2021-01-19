@@ -356,7 +356,7 @@
     <p id="t302" class="pln"><span class="n"><a href="#t302">302</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t303" class="run"><span class="n"><a href="#t303">303</a></span><span class="t"><span class="op">@</span><span class="nam">api_view</span><span class="op">(</span><span class="op">[</span><span class="str">'GET'</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t304" class="run"><span class="n"><a href="#t304">304</a></span><span class="t"><span class="op">@</span><span class="nam">permission_classes</span><span class="op">(</span><span class="op">(</span><span class="nam">IsAuthenticated</span><span class="op">,</span> <span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t305" class="run"><span class="n"><a href="#t305">305</a></span><span class="t"><span class="key">def</span> <span class="nam">api_single_log</span><span class="op">(</span><span class="nam">request</span><span class="op">,</span> <span class="nam">employee_id</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t305" class="run"><span class="n"><a href="#t305">305</a></span><span class="t"><span class="key">def</span> <span class="nam">api_single_log</span><span class="op">(</span><span class="nam">request</span><span class="op">,</span> <span class="nam">employee_id</span><span class="op">:</span> <span class="nam">int</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t306" class="run"><span class="n"><a href="#t306">306</a></span><span class="t">    <span class="key">if</span> <span class="nam">request</span><span class="op">.</span><span class="nam">method</span> <span class="op">==</span> <span class="str">'GET'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t307" class="run"><span class="n"><a href="#t307">307</a></span><span class="t">        <span class="nam">emps</span> <span class="op">=</span> <span class="nam">get_object_or_404</span><span class="op">(</span><span class="nam">Employee</span><span class="op">,</span> <span class="nam">id</span><span class="op">=</span><span class="nam">employee_id</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t308" class="run"><span class="n"><a href="#t308">308</a></span><span class="t">        <span class="nam">logs</span> <span class="op">=</span> <span class="nam">Logger</span><span class="op">.</span><span class="nam">objects</span><span class="op">.</span><span class="nam">filter</span><span class="op">(</span><span class="nam">emp</span><span class="op">=</span><span class="nam">emps</span><span class="op">.</span><span class="nam">id</span><span class="op">)</span><span class="op">.</span><span class="nam">order_by</span><span class="op">(</span><span class="str">'-date_and_time'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -367,7 +367,7 @@
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.3.1</a>,
-            created at 2021-01-19 14:35 +0600
+            created at 2021-01-19 15:41 +0600
         </p>
     </div>
 </div>

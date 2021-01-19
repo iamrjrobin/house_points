@@ -302,7 +302,7 @@ def api_taking_logs(request):
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticated, ))
-def api_single_log(request, employee_id):
+def api_single_log(request, employee_id: int):
     if request.method == 'GET':
         emps = get_object_or_404(Employee, id=employee_id)
         logs = Logger.objects.filter(emp=emps.id).order_by('-date_and_time')
