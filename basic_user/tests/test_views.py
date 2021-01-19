@@ -59,13 +59,13 @@ pytestmark = pytest.mark.django_db
     #     # assert response.status_code == 200, '....'
 
 class TestViews(TestCase):
+
     def test_login(self, username='testclient', password='password'):
-        response = self.client.post('/login/', {
+        resp = self.client.post('/login/', {
             'username': username,
             'password': password,
         })
-        return redirect ('/admin/')
-
+        
 
     def test_display(self):
         req = RequestFactory().get('basic_user/show.html')
@@ -92,7 +92,15 @@ class TestViews(TestCase):
         resp = views.single_log(req, employee_id=obj.pk)
         assert resp.status_code == 200, 'Should show all log of that employee'
 
+#
+#
+#
+#
+#api tests
+
+
 class TestApi(APITestCase):
+    
     
     def test_api_display(self):
         req = APIRequestFactory().get('/')
@@ -101,12 +109,19 @@ class TestApi(APITestCase):
         req.user = AnonymousUser()
         resp = views.api_display(req)
         assert resp.status_code == 200, 'Should be callable by anyone'
+
         data = {"name": "testHouseName", "point": 0}
         user = User.objects.filter().first()
         req = APIRequestFactory().post('/',data, format = 'json')
-        force_authenticate(req, user=user.pk, token=user.auth_token)
+        force_authenticate(req, user=user, token=user.auth_token)
         resp = views.api_display(req)
         assert resp.status_code == 201, 'Should create new house'
+
+        data2 = {}
+        req = APIRequestFactory().post('/',data2, format = 'json')
+        force_authenticate(req, user=user, token=user.auth_token)
+        resp = views.api_display(req)
+        assert resp.status_code == 400, 'Invaild info'
 
 
 
@@ -120,21 +135,102 @@ class TestApi(APITestCase):
         data = {"username": "testusername", "first_name": "testname", "email": "test@loc.com", "password": "testing3321", "password2": "testing321"}
         req = APIRequestFactory().post("api/signup", data, format='json')
         resp = views.api_signup(req)
-        assert resp.status_code == 400, 'Both password must match'
+        assert resp.status_code == 400, 'Bad request. Both password must match'
+        # data = {}
+        # req = APIRequestFactory().post("api/signup", data, format='json')
+        # resp = views.api_signup(req)
+        # assert resp.status_code == 422, 'invalid data'
     
-    
+    def test_api_details(self):
+        obj = mixer.blend('basic_user.House')
+        req = APIRequestFactory().get('api/details/<obj.pk>')
+        resp = views.api_details(req,house_id=obj.pk)
+        assert resp.status_code == 200, 'Should be callable by belonging house'
 
-    # def test_api_display_post(client):  
-    #     client.login(username="foo", password="bar")
-    #     response = client.get(url, follow=True)
-    #     assert response.status_code == 200
-    #     response = admin_client.get(url, follow=True)
-    #     assert response.status_code == 200
-    #     obj = mixer.blend('basic_user.House')
-    #     data = {'name': 'tsetssdfa'}        
-    #     req = RequestFactory().post('/', data=data)
-    #     req.user = AnonymousUser()
-    #     resp = views.api_display(req)
-    #     assert resp.status_code == 302, 'Should be callable by anyone'
-    #     obj.refresh_from_db()
-    #     assert obj.name == 'tsetssdfa', 'Should be the new name'
+    def test_api_all_emp(self):
+        user = mixer.blend('auth.User')
+        Employee.objects.first().delete()
+        # ob = mixer.blend('basic_user.Employee')
+        house = mixer.blend('basic_user.House')
+        req = APIRequestFactory().get('api/show_all_emp/')
+        resp = views.api_all_emp(req)
+        assert resp.status_code == 200, 'Should be callable by anyone'
+
+        data = {"user": user.pk, "name": "testNameEmp", "designation": "student", "points": 0, "house": house.pk}
+        data=json.dumps(data)
+        print(data)
+        req = APIRequestFactory().post("api/show_all_emp/",data, content_type= "application/json")
+        force_authenticate(req, user=user, token=user.auth_token)
+        resp = views.api_all_emp(req)
+        assert resp.status_code == 201, 'Should create new emp'   
+
+        data = {}
+        req = APIRequestFactory().post("api/show_all_emp/",data)
+        force_authenticate(req, user=user, token=user.auth_token)
+        resp = views.api_all_emp(req)
+        assert resp.status_code == 400, 'Invalid data'
+
+
+    def test_api_all_emp_update(self):
+        user = mixer.blend('auth.User')
+        o = mixer.blend('basic_user.House')
+        data = {"user":user.pk,"name": "testHouseName","designation": "student", "points": 0, "house": o.pk}
+        # user = User.objects.filter().first()
+        req = APIRequestFactory().put('api/api_all_emp_update/<ob.pk>', data, format = 'json')
+        force_authenticate(req, user=user,token=user.auth_token)
+        resp = views.api_all_emp_update(req,employee_id=1)
+        assert resp.status_code == 201, 'Should update'
+   
+    def test_api_all_emp_partial_update(self):
+        user = mixer.blend('auth.User', )
+        house = mixer.blend('basic_user.House')
+        # employee = mixer.blend('basic_user.Employee', user=user, house=house)
+        data = {"name": "testname", "designation": "Student", "house": house.id}
+        req = APIRequestFactory().patch('api/api_all_emp_partial_update/<house.pk>/<employee.pk>', data)
+        # print(req)
+        force_authenticate(req, user=user, token= user.auth_token)
+        resp = views.api_all_emp_partial_update(req, house_id=house.id, employee_id=1)
+        assert resp.status_code == 201, "Should update"
+
+
+    def test_api_taking_logs(self):
+        user = mixer.blend('auth.User')
+        house = mixer.blend('basic_user.House')
+        logger = mixer.blend('basic_user.Logger', emp = Employee.objects.first())
+        req = APIRequestFactory().get('api/logs')
+        force_authenticate(req, user=user, token=user.auth_token)
+        resp = views.api_taking_logs(req)
+        assert resp.status_code == 200, "Should show all logs"
+
+    def test_api_single_log(self):
+        user = mixer.blend('auth.User')
+        house = mixer.blend('basic_user.House')
+        logger = mixer.blend('basic_user.Logger', emp = Employee.objects.first())
+        req = APIRequestFactory().get('api/logs/single_logs/<employee.pk>')
+        force_authenticate(req, user=user, token=user.auth_token)
+        resp = views.api_single_log(req, employee_id=1)
+        assert resp.status_code == 200, 'Should show log of an user'
+
+    def test_api_points(self):
+        user = mixer.blend('auth.User')
+        house = mixer.blend('basic_user.House')
+        points = mixer.blend('basic_user.Point', employee = Employee.objects.first())
+        req = APIRequestFactory().get('api/api_points/')
+        resp = views.api_points(req)
+        assert resp.status_code == 200, 'Should show points'
+
+        data = {"employee": user.pk, "value": 10, "remarks": "good employee"}
+        req = APIRequestFactory().post("api/api_points/",data)
+        force_authenticate(req, user=user, token=user.auth_token)
+        resp = views.api_points(req)
+        assert resp.status_code == 400, 'Invalid data'
+
+        data = {"employee": user.pk, "value": 10, "remarks": "good employee"}
+        data=json.dumps(data)
+        print(data)
+        req = APIRequestFactory().post("api/api_points/",data,content_type= "application/json")
+        force_authenticate(req, user=user, token=user.auth_token)
+        resp = views.api_points(req)
+        assert resp.status_code == 201, 'Should add points'   
+
+       

@@ -5,6 +5,7 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 from rest_framework.authtoken import views as view
+from rest_framework.authtoken.views import obtain_auth_token
 
 from . import views
 
@@ -33,6 +34,7 @@ urlpatterns = [
     path('logs/',views.taking_logs, name = 'logger'),
     path('<int:house_id>/', views.details, name='details'),
     path('api/signup', views.api_signup, name = 'api_signup'),
+    path('api/login', obtain_auth_token, name = 'api_login'),
     path('api/display/', views.api_display, name = 'api_show'),
     path('api/display/<int:house_id>', views.api_details, name = 'api_details'),
     path('api/display/find/<int:house_id>', views.Emp_list_view.as_view(), name = 'emp_list_view'),

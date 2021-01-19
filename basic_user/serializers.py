@@ -43,6 +43,12 @@ class SignUp_Serializer(serializers.ModelSerializer):
         employee.save()
         return employee
 
+class Login_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'password',]
+        
+
 class House_Serializer(serializers.ModelSerializer):
     class Meta:
         model = House
@@ -52,7 +58,7 @@ class Emp_Serializer(serializers.ModelSerializer):
     # house = House_Serializer()
     class Meta:
         model = Employee
-        fields = ['id','name', 'designation', 'points','house']
+        fields = ['user', 'id','name', 'designation', 'points','house']
 
 class Emp_SerializerForPatch(serializers.ModelSerializer):
     # house = House_Serializer()

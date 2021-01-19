@@ -20,7 +20,8 @@ from basic_user.forms import SignUpForm
 from .models import Employee, House, Logger, Point
 from .serializers import (Emp_Serializer, Emp_SerializerForPatch,
                           House_Serializer, Logger_Serializer,
-                          Point_Serializer, SignUp_Serializer)
+                          Login_Serializer, Point_Serializer,
+                          SignUp_Serializer)
 
 # Create your views here.
 
@@ -146,6 +147,15 @@ def api_signup(request):
         # else:
         #     data = ser.errors
         # return Response(data)
+# @api_view(['POST',])
+# @permission_classes((AllowAny,))
+# def api_login(request):
+#     if request.method == 'POST':
+#         ser = Login_Serializer(data = request.data)
+#         if ser.is_valid():
+#            return JsonResponse(ser.data, status = status.HTTP_200_OK) 
+#         return Response(ser.errors, status = status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET', 'POST'])
 @permission_classes((IsAuthenticatedOrReadOnly, ))
@@ -179,6 +189,7 @@ def api_details(request, house_id):
         # filter_backends = [filters.SearchFilter]
         # search_fields = ['name']
         return Response(ser.data)
+        
 class Emp_list_view(generics.ListAPIView):
     queryset = Employee.objects.all()
     serializer_class = Emp_Serializer
@@ -205,12 +216,15 @@ def api_all_emp(request):
         return JsonResponse(ser.data, safe=False)
     
     elif request.method =='POST':
-        data = JSONParser().parse(request)
-        ser = Emp_Serializer(data=data)
+        # data = JSONParser().parse(request)
+        # print(request.data)
+        ser = Emp_Serializer(data=request.data)
 
         if ser.is_valid():
+            print(ser.validated_data)
             ser.save()
-            return JsonResponse(ser.data, status =201)
+            return JsonResponse(ser.data, status = 201)
+        # print(ser.data)
         return JsonResponse(ser.errors, status = 400)
     
     # elif request.method == 'PUT':
@@ -241,7 +255,7 @@ def api_all_emp_update(request,employee_id):
             return JsonResponse(ser.data, status =201)
         return JsonResponse(ser.errors,status=400)
 
-@api_view(['PATCH'])
+@api_view(['PATCH']) 
 @permission_classes((IsAuthenticatedOrReadOnly, ))
 def api_all_emp_partial_update(request, house_id,employee_id):
     try:
@@ -255,7 +269,9 @@ def api_all_emp_partial_update(request, house_id,employee_id):
             ser.save()
             data["success"]= "patch successful"
             return JsonResponse(ser.data, status =201)
+            # return Response(ser.data, status=status.HTTP_201_CREATED)
         return JsonResponse(ser.errors,status=400)
+        # return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
