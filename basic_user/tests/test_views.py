@@ -60,9 +60,32 @@ pytestmark = pytest.mark.django_db
 
 class TestViews(TestCase):
 
+    def test_signup(self, username = 'testclient', full_name = 'testname', email = 'email@email.com', password1 = 'testing321', password2='testing321'):
+        house = mixer.blend('basic_user.House')
+        resp = self.client.post('/signup/',{
+            'username': username,
+            'full_name': full_name,
+            'email': email,
+            'password1': password1,
+            'password2': password2,
+        })
+        resp = self.client.post('/signup/',{
+            'username': username,
+            'fullname': full_name,
+            'email': email,
+            'password1': password1,
+            'password2': password2,
+        })
+
+
     def test_login(self, username='testclient', password='password'):
         resp = self.client.post('/login/', {
             'username': username,
+            'password': password,
+        })
+        
+        resp = self.client.post('/login/', {
+            'uname': username,
             'password': password,
         })
         

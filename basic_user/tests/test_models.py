@@ -14,10 +14,10 @@ class TestModels:
         assert obj.pk == 1, 'Should create a post instance'
 
 
-        # def own_ponits(self):
-        #     employees = Point.objects.filter(employee=self)
-        # points = 0
-        # for e in employees:
-        #     points += e.value
-        # self.points=points
-        # self.save()
+    def own_ponits(self):
+        employees = Point.objects.filter(employee=self)
+        points = 0
+        for e in employees:
+            points += e.value
+        self.points=points
+        self.save()
