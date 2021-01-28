@@ -1,6 +1,6 @@
 # created by virtualenv automatically
 
-htmlcov/**
+htmlcov/
 .tox/
 .nox/
 .coverage
