@@ -23,10 +23,6 @@ from .serializers import (Emp_Serializer, Emp_SerializerForPatch,
                           Login_Serializer, Point_Serializer,
                           SignUp_Serializer)
 
-# Create your views here.
-
-# class HomeView(LoginRequiredMixin, TemplateView):
-#     template_name = "home.html" 
 def signup_view(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -56,17 +52,14 @@ def login_view(request):
 
 def display(request):
     house = House.objects.annotate(pnt=Sum("employee__point__value")).order_by('-pnt')
-    # house = House.objects.all().order_by('-point')
     for h in house:
         h.points()
-    # h = House.objects.all()
     query = request.GET.get("q")
     if query:
         house =house.filter(name__icontains=query)
     context = {
         'house' : house
     }
-    # print(house)
     return render (request, 'basic_user/show.html',context)
 
 def details(request, house_id):
@@ -75,20 +68,11 @@ def details(request, house_id):
     for employee in employees:
         employee.own_ponits()
     employees = Employee.objects.filter(house=house).annotate(p=Sum("point__value")).order_by('-p')
-    # house = House.objects.all().order_by('-point')
-    # employees = employees.order_by('-points')
     query = request.GET.get("q")
     query_min = request.GET.get("q_min")
     query_max = request.GET.get("q_max")
     if query:
         employees =employees.filter(name__icontains=query)
-    # if query_min and query_max:
-    #     # employees = Point.objects.filter(value__range=(query_min, query_max))
-    #     employees = employees.filter(point__value__range=(query_min, query_max))
-    # if query_max:
-    #     employees = employees.annotate(points = Sum("point__value")).filter(points__gte=query_max)
-    # if query_min:
-    #     employees = employees.annotate(points = Sum("point__value")).filter(points__lte=query_min)
 
     if query_max:
         employees = employees.filter(points__lte= query_max)
@@ -100,11 +84,7 @@ def details(request, house_id):
     return render(request, 'basic_user/details.html',context)
 
 def taking_logs(request):
-    # emps= get_object_or_404(Employee)
-    # logs= get_object_or_404(Logger)
-    # super().taking_logs(Employee, Logger)
     log = Logger.objects.all().order_by('-date_and_time')
-    # house = House.objects.annotate(point=Sum("employee__point__value")).order_by('-point')
     house =  House.objects.all().order_by('-point')
     context={
         'log' : log, 
@@ -139,38 +119,15 @@ def api_signup(request):
         return Response(ser.errors, status = status.HTTP_400_BAD_REQUEST)
 
 
-        # data = {}
-        # if ser.is_valid():
-        #     employee = ser.save()
-        #     data['response'] = "Successfully created user."
-        #     data['name'] = employee.name 
-        # else:
-        #     data = ser.errors
-        # return Response(data)
-# @api_view(['POST',])
-# @permission_classes((AllowAny,))
-# def api_login(request):
-#     if request.method == 'POST':
-#         ser = Login_Serializer(data = request.data)
-#         if ser.is_valid():
-#            return JsonResponse(ser.data, status = status.HTTP_200_OK) 
-#         return Response(ser.errors, status = status.HTTP_400_BAD_REQUEST)
-
-
 @api_view(['GET', 'POST'])
 @permission_classes((IsAuthenticatedOrReadOnly, ))
 def api_display(request):
     if request.method == 'GET':
-        # house = House.objects.annotate(point=Sum("employee__point__value")).order_by('-point')
-        # house = House.objects.all()
-        # for h in house:
-        #     h.point()
         house = House.objects.all().order_by('-point')
         ser = House_Serializer(house, many= True)
         return Response(ser.data)
     
     elif request.method == 'POST':
-        # data = JSONParser().parse(request)
         ser = House_Serializer(data=request.data)
         
         if ser.is_valid():
@@ -183,11 +140,8 @@ def api_display(request):
 def api_details(request, house_id):
     if request.method == 'GET':
         house= get_object_or_404(House, id=house_id)
-        # employees = Employee.objects.filter(house=house).annotate(points=Sum("point__value")).order_by('-points')
         employees = Employee.objects.filter(house=house).order_by('-points')
         ser = Emp_Serializer(employees, many = True)
-        # filter_backends = [filters.SearchFilter]
-        # search_fields = ['name']
         return Response(ser.data)
         
 class Emp_list_view(generics.ListAPIView):
@@ -199,14 +153,6 @@ class Emp_list_view(generics.ListAPIView):
     }
     search_fields = ['name']
 
-    # elif request.method == 'POST':
-    #     data = JSONParser().parse(request)
-    #     ser = Emp_Serializer(data=data)
-        
-    #     if ser.is_valid():
-    #         ser.save()
-    #         return JsonResponse(ser.data,status = 201)
-    #     return JsonResponse(ser.errors, status = 400)
 @api_view(['GET', 'POST'])
 @permission_classes((IsAuthenticatedOrReadOnly, ))
 def api_all_emp(request):
@@ -216,26 +162,14 @@ def api_all_emp(request):
         return JsonResponse(ser.data, safe=False)
     
     elif request.method =='POST':
-        # data = JSONParser().parse(request)
-        # print(request.data)
         ser = Emp_Serializer(data=request.data)
 
         if ser.is_valid():
             print(ser.validated_data)
             ser.save()
             return JsonResponse(ser.data, status = 201)
-        # print(ser.data)
         return JsonResponse(ser.errors, status = 400)
     
-    # elif request.method == 'PUT':
-    #     ser = Emp_Serializer(employees,data = request.data)
-    #     data = {}
-    #     if ser.is_valid():
-    #         ser.save()
-    #         date["success"]= "update successful"
-    #         return JsonResponse(ser.data, status =201)
-    #     return JsonResponse(ser.errors,status=400)
-
 
 @api_view(['PUT','PATCH'])
 @permission_classes((IsAuthenticatedOrReadOnly, ))
@@ -246,7 +180,6 @@ def api_all_emp_update(request,employee_id):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'PUT':
-        # employees = Employee.objects.all()
         ser = Emp_Serializer(employees,data = request.data)
         data = {}
         if ser.is_valid():
@@ -269,10 +202,7 @@ def api_all_emp_partial_update(request, house_id,employee_id):
             ser.save()
             data["success"]= "patch successful"
             return JsonResponse(ser.data, status =201)
-            # return Response(ser.data, status=status.HTTP_201_CREATED)
         return JsonResponse(ser.errors,status=400)
-        # return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 @api_view(['GET', 'POST'])

@@ -27,7 +27,10 @@ SECRET_KEY = '+@9d8!sz%t3-%+c+ysfyea9d@v-fa-yv+!zho-!dmq_@4e+_0$'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['housepoint.herokuapp.com']
+ALLOWED_HOSTS = ['housepoint.herokuapp.com',
+                'localhost',
+                '127.0.0.1'                
+]
 
 
 # Application definition

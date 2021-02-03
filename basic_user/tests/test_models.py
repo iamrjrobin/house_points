@@ -7,9 +7,7 @@ pytestmark = pytest.mark.django_db
 class TestModels:
     def test_employee(self):
         obj = mixer.blend('auth.User', is_superuser = False)
-        # emp_obj = mixer.blend('basic_user.Employee')
         object = mixer.blend('basic_user.House')
-        # point_obj = mixer.blend('basic_user.Point')
         assert (obj.employee.__str__()== obj.username)
         assert obj.pk == 1, 'Should create a post instance'
 

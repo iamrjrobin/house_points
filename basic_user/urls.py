@@ -46,11 +46,9 @@ urlpatterns = [
     path('api/api_all_emp_update/<int:employee_id>',views.api_all_emp_update, name = 'api_all_emp_update'), 
     path('api/api_all_emp_partial_update/<int:house_id>/<int:employee_id>',views.api_all_emp_partial_update, name = 'api_all_emp_partial_update'),
     path('api/api_points/', views.api_points, name = 'api_points'),
-    # url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('oauth/', include('social_django.urls', namespace='social')),
     
-    # url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
 
 

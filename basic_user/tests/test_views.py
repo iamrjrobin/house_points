@@ -18,46 +18,6 @@ from rest_framework.test import (APIClient, APIRequestFactory, APITestCase,
 
 pytestmark = pytest.mark.django_db
 
-
-# class TestViews(TestCase):
-    
-#     # def setUp(self):
-#     #     self.client = Client()
-#         # self.display_url = reverse('show')
-#         # self.details_url = reverse('details', args=['trial'])
-#         # self.trial = Employee.objects.create(
-#         #     user = 999,
-#         #     name = 'trial',
-#         #     designation = 'student',
-#         #     points = 0,
-#         #     house = 'trial_house' 
-#         # )
-
-#     def test_display_GET(self):
-#         client = Client()
-#         response = client.get(reverse('show'))
-#         self.assertEqual(response.status_code, 200)
-#         self.assertTemplateUsed(response, 'basic_user/show.html')
-    
-    # def test_details_GET(self):
-    #     # req = RequestFactory().get('basic_user/details.html')
-    #     client = Client()
-    #     # trial = Employee.objects.create(
-    #     #     user = 1,
-    #     #     name = 'trial',
-    #     #     designation = 'student',
-    #     #     points = 0,
-    #     #     house = 1
-    #     # )
-        
-    #     # house_id = 1
-    #     response = client.get(reverse('details', kwargs={'house_id':1}))
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTemplateUsed(response, 'basic_user/1/details.html')
-    #     # assert (house.objects.all().count() == 1, "Has house")
-    #     # resp = views.details(req)
-    #     # assert response.status_code == 200, '....'
-
 class TestViews(TestCase):
 
     def test_signup(self, username = 'testclient', full_name = 'testname', email = 'email@email.com', password1 = 'testing321', password2='testing321'):
@@ -111,7 +71,6 @@ class TestViews(TestCase):
         req = RequestFactory().get('basic_user/single_log.html')
         obj = mixer.blend('auth.User', is_superuser = False)
         o = mixer.blend('basic_user.House')
-        # ob = mixer.blend('basic_user.Employee')
         resp = views.single_log(req, employee_id=obj.pk)
         assert resp.status_code == 200, 'Should show all log of that employee'
 
@@ -154,15 +113,11 @@ class TestApi(APITestCase):
         req = APIRequestFactory().post("api/signup", data, format='json')
         resp = views.api_signup(req)
         assert resp.status_code == 201, 'Should create a new user'
-        # obj = mixer.blend('basic_user.House')
         data = {"username": "testusername", "first_name": "testname", "email": "test@loc.com", "password": "testing3321", "password2": "testing321"}
         req = APIRequestFactory().post("api/signup", data, format='json')
         resp = views.api_signup(req)
         assert resp.status_code == 400, 'Bad request. Both password must match'
-        # data = {}
-        # req = APIRequestFactory().post("api/signup", data, format='json')
-        # resp = views.api_signup(req)
-        # assert resp.status_code == 422, 'invalid data'
+       
     
     def test_api_details(self):
         obj = mixer.blend('basic_user.House')
@@ -173,7 +128,6 @@ class TestApi(APITestCase):
     def test_api_all_emp(self):
         user = mixer.blend('auth.User')
         Employee.objects.first().delete()
-        # ob = mixer.blend('basic_user.Employee')
         house = mixer.blend('basic_user.House')
         req = APIRequestFactory().get('api/show_all_emp/')
         resp = views.api_all_emp(req)
@@ -198,7 +152,6 @@ class TestApi(APITestCase):
         user = mixer.blend('auth.User')
         o = mixer.blend('basic_user.House')
         data = {"user":user.pk,"name": "testHouseName","designation": "student", "points": 0, "house": o.pk}
-        # user = User.objects.filter().first()
         req = APIRequestFactory().put('api/api_all_emp_update/<ob.pk>', data, format = 'json')
         force_authenticate(req, user=user,token=user.auth_token)
         resp = views.api_all_emp_update(req,employee_id=1)
@@ -207,10 +160,8 @@ class TestApi(APITestCase):
     def test_api_all_emp_partial_update(self):
         user = mixer.blend('auth.User', )
         house = mixer.blend('basic_user.House')
-        # employee = mixer.blend('basic_user.Employee', user=user, house=house)
         data = {"name": "testname", "designation": "Student", "house": house.id}
         req = APIRequestFactory().patch('api/api_all_emp_partial_update/<house.pk>/<employee.pk>', data)
-        # print(req)
         force_authenticate(req, user=user, token= user.auth_token)
         resp = views.api_all_emp_partial_update(req, house_id=house.id, employee_id=1)
         assert resp.status_code == 201, "Should update"
