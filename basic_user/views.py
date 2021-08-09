@@ -14,6 +14,7 @@ from rest_framework.permissions import (AllowAny, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.authtoken.models import Token
 
 from basic_user.forms import SignUpForm
 
@@ -87,7 +88,7 @@ def taking_logs(request):
     log = Logger.objects.all().order_by('-date_and_time')
     house =  House.objects.all().order_by('-point')
     context={
-        'log' : log, 
+        'log' : log,
         'house' : house
     }
     return render(request, 'basic_user/logs.html', context)
@@ -99,23 +100,29 @@ def single_log(request, employee_id):
     context = {
         'logs' : logs,
         'house' : house
-    }   
+    }
     return render(request, 'basic_user/single_log.html', context)
 
 
 #api section
-# 
-# 
-# 
+#
+#
+#
 
 @api_view(['POST',])
 @permission_classes((AllowAny,))
 def api_signup(request):
     if request.method == 'POST':
         ser = SignUp_Serializer(data=request.data)
+        data = {}
         if ser.is_valid():
-            ser.save()
-            return JsonResponse(ser.data, status = status.HTTP_201_CREATED)
+            account = ser.save()
+            token = Token.objects.get(user=account).key
+            data['username'] = ser.data.get('username')
+            data['first_name'] = ser.data.get('first_name')
+            data['email'] = ser.data.get('email')
+            data['token'] = token
+            return JsonResponse(data, status = status.HTTP_201_CREATED)
         return Response(ser.errors, status = status.HTTP_400_BAD_REQUEST)
 
 
@@ -126,10 +133,10 @@ def api_display(request):
         house = House.objects.all().order_by('-point')
         ser = House_Serializer(house, many= True)
         return Response(ser.data)
-    
+
     elif request.method == 'POST':
         ser = House_Serializer(data=request.data)
-        
+
         if ser.is_valid():
             ser.save()
             return JsonResponse(ser.data, status = status.HTTP_201_CREATED)
@@ -143,7 +150,7 @@ def api_details(request, house_id):
         employees = Employee.objects.filter(house=house).order_by('-points')
         ser = Emp_Serializer(employees, many = True)
         return Response(ser.data)
-        
+
 class Emp_list_view(generics.ListAPIView):
     queryset = Employee.objects.all()
     serializer_class = Emp_Serializer
@@ -158,9 +165,9 @@ class Emp_list_view(generics.ListAPIView):
 def api_all_emp(request):
     if request.method == 'GET':
         employees = Employee.objects.all()
-        ser = Emp_Serializer(employees, many = True)    
+        ser = Emp_Serializer(employees, many = True)
         return JsonResponse(ser.data, safe=False)
-    
+
     elif request.method =='POST':
         ser = Emp_Serializer(data=request.data)
 
@@ -169,7 +176,7 @@ def api_all_emp(request):
             ser.save()
             return JsonResponse(ser.data, status = 201)
         return JsonResponse(ser.errors, status = 400)
-    
+
 
 @api_view(['PUT','PATCH'])
 @permission_classes((IsAuthenticatedOrReadOnly, ))
@@ -188,7 +195,7 @@ def api_all_emp_update(request,employee_id):
             return JsonResponse(ser.data, status =201)
         return JsonResponse(ser.errors,status=400)
 
-@api_view(['PATCH']) 
+@api_view(['PATCH'])
 @permission_classes((IsAuthenticatedOrReadOnly, ))
 def api_all_emp_partial_update(request, house_id,employee_id):
     try:
@@ -223,7 +230,7 @@ def api_points(request):
         return Response(ser.errors, status = status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET'])    
+@api_view(['GET'])
 @permission_classes((IsAuthenticated, ))
 def api_taking_logs(request):
     if request.method == 'GET':
