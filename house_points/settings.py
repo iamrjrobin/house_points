@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'rest_framework.authtoken',
     'social_django',
+    'django_extensions',
     # 'house_points.core',
 ]
 REST_FRAMEWORK = {

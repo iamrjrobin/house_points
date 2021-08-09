@@ -214,13 +214,14 @@ def api_points(request):
         return JsonResponse(ser.data, safe =False)
 
     elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        ser = Point_Serializer(data=data)
+        # data = JSONParser().parse(request)
+        ser = Point_Serializer(data=request.data)
 
         if ser.is_valid():
             ser.save()
-            return JsonResponse(ser.data, status = 201)
-        return JsonResponse(ser.errors, status = 400)
+            return JsonResponse(ser.data, status = status.HTTP_201_CREATED)
+        return Response(ser.errors, status = status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET'])    
 @permission_classes((IsAuthenticated, ))
