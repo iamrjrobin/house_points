@@ -240,9 +240,9 @@ def api_taking_logs(request):
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticated, ))
-def api_single_log(request, employee_id: int):
+def api_single_log(request):
     if request.method == 'GET':
-        emps = get_object_or_404(Employee, id=employee_id)
+        emps = get_object_or_404(Employee, id=request.user.employee.id)
         logs = Logger.objects.filter(emp=emps.id).order_by('-date_and_time')
         ser = Logger_Serializer(logs, many = True)
         return JsonResponse(ser.data, safe = False)
@@ -251,7 +251,7 @@ def api_single_log(request, employee_id: int):
 @permission_classes((IsAuthenticated, ))
 def api_emp_self_patch(request):
     if request.method == 'PATCH':
-        emps = get_object_or_404(Employee, id=request.user.id)
+        emps = get_object_or_404(Employee, id=request.user.employee.id)
         ser = Emp_Self_Patch_Serializer(emps, data=request.data, partial = True)
         data = {}
         if ser.is_valid():
