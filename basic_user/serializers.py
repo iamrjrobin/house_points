@@ -21,7 +21,7 @@ class SignUp_Serializer(serializers.ModelSerializer):
         )
         password = self.validated_data['password']
         password2 = self.validated_data['password2']
-        
+
         if password != password2:
             raise serializers.ValidationError({'password': 'Passwords must match.'})
         employee.set_password(password)
@@ -32,7 +32,7 @@ class Login_Serializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'password',]
-        
+
 
 class House_Serializer(serializers.ModelSerializer):
     class Meta:
@@ -56,6 +56,11 @@ class Logger_Serializer(serializers.ModelSerializer):
         fields = ['emp', 'remarks','date_and_time']
 
 class Point_Serializer(serializers.ModelSerializer):
-    class Meta: 
+    class Meta:
         model = Point
         fields = ['employee','value','remarks']
+
+class Emp_Self_Patch_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = ['name']

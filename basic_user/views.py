@@ -19,7 +19,7 @@ from rest_framework.authtoken.models import Token
 from basic_user.forms import SignUpForm
 
 from .models import Employee, House, Logger, Point
-from .serializers import (Emp_Serializer, Emp_SerializerForPatch,
+from .serializers import (Emp_Self_Patch_Serializer, Emp_Serializer, Emp_SerializerForPatch,
                           House_Serializer, Logger_Serializer,
                           Login_Serializer, Point_Serializer,
                           SignUp_Serializer)
@@ -246,3 +246,16 @@ def api_single_log(request, employee_id: int):
         logs = Logger.objects.filter(emp=emps.id).order_by('-date_and_time')
         ser = Logger_Serializer(logs, many = True)
         return JsonResponse(ser.data, safe = False)
+
+@api_view(['PATCH'])
+@permission_classes((IsAuthenticated, ))
+def api_emp_self_patch(request):
+    if request.method == 'PATCH':
+        emps = get_object_or_404(Employee, id=request.user.id)
+        ser = Emp_Self_Patch_Serializer(emps, data=request.data, partial = True)
+        data = {}
+        if ser.is_valid():
+            ser.save()
+            data["success"] = "patch successful"
+            return JsonResponse(ser.data, status=201)
+        return JsonResponse(ser.errors, status=400)
