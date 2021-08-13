@@ -44,12 +44,15 @@ urlpatterns = [
     path('api/logs/single_logs',views.api_single_log, name = 'api_single_log'),
     path('api/show_all_emp/',  views.api_all_emp, name = 'show_all_emp'),
     path('api/api_all_emp_update/<int:employee_id>',views.api_all_emp_update, name = 'api_all_emp_update'),
+
     path('api/api_all_emp_partial_update/<int:house_id>/<int:employee_id>',views.api_all_emp_partial_update, name = 'api_all_emp_partial_update'),
+
     path('api/api_points/', views.api_points, name = 'api_points'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('oauth/', include('social_django.urls', namespace='social')),
     path('api/emp_name_update', views.api_emp_self_patch, name='emp_name_update'),
-
+    path('api/logs/single_logs/<int:employee_id>',
+         views.api_single_log_admin, name='api_single_log_admin'),
 ]
 
 

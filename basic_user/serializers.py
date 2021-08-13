@@ -37,17 +37,21 @@ class Login_Serializer(serializers.ModelSerializer):
 class House_Serializer(serializers.ModelSerializer):
     class Meta:
         model = House
-        fields = ['name', 'point','pic']
+        fields = ['name','pic']
 
 class Emp_Serializer(serializers.ModelSerializer):
+
+    house_name = serializers.SerializerMethodField()
+    def get_house_name(self, obj):
+        return obj.house.name
     class Meta:
         model = Employee
-        fields = ['user', 'id','name', 'designation', 'points','house']
+        fields = ['user', 'id','name', 'designation', 'points','house','house_name']
 
 class Emp_SerializerForPatch(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        fields = ['name', 'designation','house']
+        fields = ['designation','house']
 
 
 class Logger_Serializer(serializers.ModelSerializer):

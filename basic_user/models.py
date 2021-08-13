@@ -33,30 +33,31 @@ class Employee(models.Model):
 
 
 class Point(models.Model):
-    employee = models.ForeignKey(Employee,on_delete= models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     value = models.IntegerField(default=0)
     remarks = models.TextField(max_length=1000, null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        h=self.employee.house
+        h = self.employee.house
         before = h.get_rank()
         super(Point, self).save(*args, **kwargs)
         after = h.get_rank()
-        log = Logger(emp=self.employee, remarks=f"Point changed: {self.value} {self.remarks} Before point update house rank was {before}, after points update house rank is {after}")
+        log = Logger(
+            emp=self.employee, remarks=f"Point changed: {self.value} {self.remarks} Before point update house rank was {before}, after points update house rank is {after}")
         log.save()
-
 
 
 class House(models.Model):
     name = models.CharField(max_length=50)
     point = models.IntegerField(default=0)
-    pic = models.ImageField(default='default.jpg', upload_to ='profile_pics')
+    pic = models.ImageField(default='default.jpg', upload_to='profile_pics')
 
     def __str__(self):
         return self.name
 
     def get_rank(self) -> int:
-        houses = House.objects.annotate(pnt=Sum("employee__point__value")).order_by('-point').values_list("id", flat=True)
+        houses = House.objects.annotate(pnt=Sum("employee__point__value")).order_by(
+            '-point').values_list("id", flat=True)
 
         house_list = []
         for x in houses:
@@ -65,6 +66,7 @@ class House(models.Model):
         rank = house_list.index(self.id)
 
         return rank + 1
+
 
 
 

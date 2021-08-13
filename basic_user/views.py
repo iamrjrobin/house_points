@@ -135,6 +135,8 @@ def api_display(request):
         return Response(ser.data)
 
     elif request.method == 'POST':
+        if not request.user.is_superuser:
+            return Response('You are not allowed to add new house')
         ser = House_Serializer(data=request.data)
 
         if ser.is_valid():
@@ -169,6 +171,8 @@ def api_all_emp(request):
         return JsonResponse(ser.data, safe=False)
 
     elif request.method =='POST':
+        if not request.user.is_superuser:
+            return Response('You are not allowed to add new employee')
         ser = Emp_Serializer(data=request.data)
 
         if ser.is_valid():
@@ -198,6 +202,8 @@ def api_all_emp_update(request,employee_id):
 @api_view(['PATCH'])
 @permission_classes((IsAuthenticatedOrReadOnly, ))
 def api_all_emp_partial_update(request, house_id,employee_id):
+    if not request.user.is_superuser:
+        return Response('You are not allowed to update employee')
     try:
         employees = Employee.objects.get(id = employee_id,house = house_id)
     except Employee.DoesNotExist:
@@ -216,16 +222,38 @@ def api_all_emp_partial_update(request, house_id,employee_id):
 @permission_classes((IsAuthenticatedOrReadOnly, ))
 def api_points(request):
     if request.method == 'GET':
+        if not request.user.is_superuser:
+            return Response("You are not allowed see everyone's points")
         points = Point.objects.all()
         ser = Point_Serializer(points, many=  True)
         return JsonResponse(ser.data, safe =False)
 
     elif request.method == 'POST':
+        if not request.user.is_superuser:
+            return Response("You are not allowed assign points")
         # data = JSONParser().parse(request)
         ser = Point_Serializer(data=request.data)
 
         if ser.is_valid():
+            print(ser.validated_data)
+            point_update = Point.objects.filter(
+                employee=ser.validated_data.get('employee').id)
+            new_point = 0
+            house_id = 0
+            for p in point_update:
+                new_point = p.value + new_point
+                house_id = p.employee.house.id
+            Employee.objects.filter(id=ser.validated_data.get(
+                'employee').id).update(points=new_point)
+
+            house_emps = Employee.objects.filter(house=house_id)
+            new_house_point = 0
+            for rank in house_emps:
+                new_house_point = rank.points + new_house_point
+
+            House.objects.filter(id=house_id).update(point=new_house_point)
             ser.save()
+
             return JsonResponse(ser.data, status = status.HTTP_201_CREATED)
         return Response(ser.errors, status = status.HTTP_400_BAD_REQUEST)
 
@@ -234,6 +262,8 @@ def api_points(request):
 @permission_classes((IsAuthenticated, ))
 def api_taking_logs(request):
     if request.method == 'GET':
+        if not request.user.is_superuser:
+            return Response("You are not allowed see logs")
         log = Logger.objects.all().order_by('-date_and_time')
         ser = Logger_Serializer(log, many = True)
         return JsonResponse(ser.data,safe = False)
@@ -259,3 +289,15 @@ def api_emp_self_patch(request):
             data["success"] = "patch successful"
             return JsonResponse(ser.data, status=201)
         return JsonResponse(ser.errors, status=400)
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated, ))
+def api_single_log_admin(request, employee_id: int):
+    if request.method == 'GET':
+        if not request.user.is_superuser:
+            return Response("Normal users cannot see logs like this")
+        emps = get_object_or_404(Employee, id=employee_id)
+        logs = Logger.objects.filter(emp=emps.id).order_by('-date_and_time')
+        ser = Logger_Serializer(logs, many=True)
+        return JsonResponse(ser.data, safe=False)
